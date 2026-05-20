@@ -16,6 +16,8 @@
             --accent-glow: rgba(69, 243, 255, 0.2);
             --gold: #ffd700;
             --gold-glow: rgba(255, 215, 0, 0.3);
+            --green: #00ff66;
+            --orange: #ff9f43;
         }
 
         * {
@@ -126,6 +128,12 @@
             color: #000;
         }
 
+        .btn-success {
+            background: linear-gradient(135deg, var(--green) 0%, #00aa44 100%);
+            box-shadow: 0 4px 12px rgba(0, 255, 102, 0.2);
+            color: #000;
+        }
+
         /* MAIN PANEL */
         #main-panel {
             display: none;
@@ -179,7 +187,7 @@
             background: #000; border-radius: 6px; padding: 10px;
             font-family: monospace; font-size: 11px; color: #00ff66;
             white-space: pre-wrap; margin-top: 10px; display: none;
-            max-height: 110px; overflow-y: auto;
+            max-height: 120px; overflow-y: auto;
             border-left: 2px solid var(--accent);
         }
 
@@ -254,6 +262,37 @@
             from { opacity: 0; transform: translateY(-15px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* CUSTOM FILE UPLOAD STYLES */
+        .file-input-wrapper {
+            position: relative;
+            margin-bottom: 10px;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;
+        }
+        .file-input-btn {
+            display: block; padding: 10px; background: var(--input); border: 1px dashed var(--accent);
+            border-radius: 6px; text-align: center; font-size: 12px; color: var(--accent); font-weight: bold;
+        }
+        .file-analysis {
+            background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; font-size: 11px; margin-top: 8px; line-height: 1.6;
+            border-left: 3px solid #555; display: none;
+        }
+
+        /* LOCK LAYER FOR FILE MANAGER */
+        .lock-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(31,40,51,0.96); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            border-radius: 12px; z-index: 10;
+        }
+
+        /* BACKGROUND SERVICE BACKGROUND */
+        .bg-service-box {
+            background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 6px; margin-top: 10px;
+            font-size: 11px; display: none; border: 1px solid rgba(255,255,255,0.05);
+        }
     </style>
 </head>
 <body>
@@ -279,7 +318,6 @@
             
             <div style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 12px;">
                 <p style="font-size: 10px; color:#555; text-align:center; line-height: 1.5;">
-                 
             </div>
         </div>
 
@@ -306,14 +344,56 @@
                 <button class="btn btn-gold" onclick="buyVipWithCoins()">MUA BẢN VIP BẰNG XU (Giá: 50.000 Xu)</button>
             </div>
 
+            <div class="card" id="file-manager-card" style="border-left: 4px solid var(--green);">
+                
+                <div id="file-lock-layer" class="lock-overlay">
+                    <p style="color:var(--gold); font-weight:bold; font-size:13px; margin-bottom:3px;">🔒 CHỨC NĂNG FILE MỞ RỘNG (VIP)</p>
+                    <p style="font-size:11px; color:#888; margin-bottom:8px;">Vui lòng nâng cấp tài khoản VIP để nạp file cấu hình riêng.</p>
+                </div>
+
+                <h2>Quản Lý Tệp Tin Cấu Hình Cục Bộ</h2>
+                <p style="font-size: 11px; color:#888; margin-bottom: 10px;">Thêm tệp cấu hình tùy chỉnh để hệ thống kiểm tra chất lượng định dạng và tối ưu.</p>
+                
+                <div class="file-input-wrapper">
+                    <div class="file-input-btn" id="file-label">📥 Bấm để chọn tệp cấu hình...</div>
+                    <input type="file" id="custom-file-input" onchange="handleFileSelect(event)">
+                </div>
+
+                <div class="file-analysis" id="analysis-box">
+                    <div style="color: var(--green); font-weight: bold; margin-bottom: 5px; display: flex; justify-content: space-between;">
+                        <span>📊 KẾT QUẢ KIỂM ĐỊNH FILE:</span>
+                        <span id="file-rating-badge" style="padding: 1px 6px; border-radius: 4px; font-size: 10px;"></span>
+                    </div>
+                    <div id="analysis-details"></div>
+                </div>
+
+                <button class="btn btn-success" id="btn-inject-file" style="margin-top: 10px; padding: 11px; font-size: 13px; display: none;" onclick="executeFileInject()">KÍCH HOẠT & CHẠY NGẦM FILE</button>
+                
+                <div class="bg-service-box" id="bg-service-status">
+                    <div style="display: flex; justify-content: space-between; color: #aaa; margin-bottom: 4px;">
+                        <span>⚙️ TIẾN TRÌNH CHẠY NGẦM:</span>
+                        <span style="color: var(--green); font-weight: bold; animation: pulse 1s infinite;">● ACTIVE</span>
+                    </div>
+                    <div style="color: #fff; font-family: monospace;" id="bg-service-details">
+                        • RAM tiêu thụ: 0 MB<br>
+                        • Vòng lặp tối ưu: 0 khuyển<br>
+                        • Trạng thái nền: Đang duy trì kết nối...
+                    </div>
+                </div>
+            </div>
+
             <div class="card">
                 <h2>Trạng Thái Tệp Tin Cấu Hình</h2>
                 <div class="status-item" style="border-left: 3px solid var(--accent);">
                     <div>📄 Sensi</div>
                     <div style="color: var(--accent); font-weight:bold;">ĐÃ SẴN SÀNG</div>
                 </div>
+                <div class="status-item" id="file-custom-row" style="border-left: 3px solid #555; display: none;">
+                    <div id="file-custom-name">📄 Chưa có file</div>
+                    <div id="file-custom-status" style="color: #777; font-weight: bold;">CHƯA KÍCH HOẠT</div>
+                </div>
                 <div class="status-item" id="file-vip-row" style="border-left: 3px solid #555;">
-                    <div>📄 AimLock</div>
+                    <div>📄 Aimbot Config.xml (Extended Mesh)</div>
                     <div id="file-status-text" style="color: #777; font-weight: bold;">🔒 YÊU CẦU VIP</div>
                 </div>
             </div>
@@ -336,8 +416,8 @@
 
                 <div id="vip-features-zone" style="margin-top:20px; padding-top:15px; border-top:1px solid rgba(255,255,255,0.08); position:relative;">
                     
-                    <div id="vip-lock-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(31,40,51,0.96); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-radius: 6px;">
-                        <p style="color:var(--gold); font-weight:bold; font-size:13px; margin-bottom:3px;">🔒 MENU VIP(ĐANG KHÓA)</p>
+                    <div id="vip-lock-layer" class="lock-overlay">
+                        <p style="color:var(--gold); font-weight:bold; font-size:13px; margin-bottom:3px;">🔒 MENU VIP (ĐANG KHÓA)</p>
                         <p style="font-size:11px; color:#888; margin-bottom:8px;">Vui lòng dùng Xu để nâng cấp tài khoản.</p>
                     </div>
 
@@ -384,8 +464,7 @@
 
             <div class="qr-wrapper">
                 <img id="qr-image" src="" alt="Mã QR Chuyển Khoản">
-                <div class="qr-info" id="qr-info-text">
-                    </div>
+                <div class="qr-info" id="qr-info-text"></div>
             </div>
             
             <button class="btn" style="margin-bottom:10px;" id="verify-pay-btn" onclick="checkPaymentOnline()">XÁC NHẬN ĐÃ CHUYỂN KHOẢN</button>
@@ -397,12 +476,15 @@
         // =======================================================
         // ĐIỀN THÔNG TIN NGÂN HÀNG CỦA BẠN VÀO ĐÂY ĐỂ ĐỌC SAO KÊ
         // =======================================================
-        const MY_BANK_NAME   = "mbbank";               // Tên viết tắt ngân hàng nhận tiền (vcb, mbbank, acb, tcb...)
-        const MY_BANK_STK    = "0346044653";           // SỐ TÀI KHOẢN ngân hàng của bạn
-        const AUTH_API_KEY   = "628559fd-6d1b-4f98-9a18-b278a9c46074"; // Token API Casso của bạn
+        const MY_BANK_NAME   = "mbbank";               
+        const MY_BANK_STK    = "0346044653";           
+        const AUTH_API_KEY   = "628559fd-6d1b-4f98-9a18-b278a9c46074"; 
         
         let currentUser = "";
         let generatedMemoSuffix = "";
+        let loadedFileData = { name: "", size: 0, content: "", lines: 0, keywords: [], isGood: false };
+        let bgServiceInterval = null;
+        let bgCycleCount = 0;
         
         const systemAccounts = {
             "usenameios01": { password: "usenameios01", tier: "free", coins: 0 },
@@ -450,11 +532,158 @@
             document.getElementById('tier-badge').className = isVip ? "badge vip" : "badge free";
             document.getElementById('tier-badge').innerText = isVip ? "Thành viên VIP" : "Tài khoản Thường";
             document.getElementById('shop-banner').style.display = isVip ? 'none' : 'block';
+            
+            document.getElementById('file-lock-layer').style.display = isVip ? 'none' : 'flex';
             document.getElementById('vip-lock-layer').style.display = isVip ? 'none' : 'flex';
+            
             document.getElementById('file-status-text').innerText = isVip ? "ĐA MỞ KHÓA (VIP)" : "🔒 KHÓA (CẦN VIP)";
             document.getElementById('file-status-text').style.color = isVip ? "var(--accent)" : "#777";
             document.getElementById('file-vip-row').style.borderLeftColor = isVip ? "var(--accent)" : "#555";
             document.getElementById('fps-text').innerText = isVip ? "Tần số quét màn hình: 120Hz (Độ nhạy mượt tối đa)" : "Tần số quét màn hình: 60Hz (Giới hạn tài khoản thường)";
+        }
+
+        /* LOGIC KIỂM ĐỊNH NHẬN DIỆN FILE TỐT / KHÔNG TỐT */
+        function handleFileSelect(event) {
+            if (systemAccounts[currentUser].tier !== "vip") {
+                showToast("Quyền hạn không đủ! Tính năng chỉ dành cho VIP.", "error");
+                return;
+            }
+
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Dừng tiến trình chạy ngầm cũ nếu đang chạy khi đổi file mới
+            if (bgServiceInterval) {
+                clearInterval(bgServiceInterval);
+                document.getElementById('bg-service-status').style.display = 'none';
+            }
+
+            document.getElementById('file-label').innerText = `📄 ${file.name}`;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const lines = content.split('\n');
+                
+                const checkKeywords = ['sensi', 'aimbot', 'lock', 'speed', 'regedit', 'hax', 'dpi'];
+                let detected = [];
+                checkKeywords.forEach(kw => {
+                    if (content.toLowerCase().includes(kw)) {
+                        detected.push(kw.toUpperCase());
+                    }
+                });
+
+                // Tiêu chí nhận diện File Tốt / Không tốt:
+                // File TỐT: Nội dung không rỗng, số dòng > 3, dung lượng > 15 bytes và chứa ít nhất một từ khóa hợp lệ.
+                let isGoodFile = (content.trim().length > 15 && lines.length >= 3 && detected.length > 0);
+
+                loadedFileData = {
+                    name: file.name,
+                    size: file.size,
+                    content: content,
+                    lines: lines.length,
+                    keywords: detected,
+                    isGood: isGoodFile
+                };
+
+                const analysisBox = document.getElementById('analysis-box');
+                const analysisDetails = document.getElementById('analysis-details');
+                const ratingBadge = document.getElementById('file-rating-badge');
+                
+                analysisBox.style.display = 'block';
+
+                // Thiết lập nhãn nhận diện file
+                if (loadedFileData.isGood) {
+                    ratingBadge.innerText = "FILE TỐT";
+                    ratingBadge.style.background = "rgba(0, 255, 102, 0.2)";
+                    ratingBadge.style.color = "var(--green)";
+                    ratingBadge.style.border = "1px solid var(--green)";
+                } else {
+                    ratingBadge.innerText = "KHÔNG TỐT";
+                    ratingBadge.style.background = "rgba(255, 71, 87, 0.2)";
+                    ratingBadge.style.color = "var(--primary)";
+                    ratingBadge.style.border = "1px solid var(--primary)";
+                }
+                
+                analysisDetails.innerHTML = `
+                    • Tên file: <span style="color:#fff;">${loadedFileData.name}</span><br>
+                    • Dung lượng: <span style="color:#fff;">${loadedFileData.size} bytes</span><br>
+                    • Số hàng dữ liệu: <span style="color:#fff;">${loadedFileData.lines} dòng</span><br>
+                    • Từ khóa khớp: <span style="color:var(--gold);">${loadedFileData.keywords.length > 0 ? loadedFileData.keywords.join(', ') : 'Trống / Không xác định'}</span><br>
+                    • Đánh giá sơ bộ: <span style="color:${loadedFileData.isGood ? 'var(--green)' : 'var(--primary)'}; font-weight: bold;">${loadedFileData.isGood ? 'Định dạng chuẩn sạch, khuyến nghị dùng' : 'Thiếu từ khóa tối ưu hoặc dung lượng quá ngắn'}</span>
+                `;
+
+                document.getElementById('btn-inject-file').style.display = 'block';
+
+                document.getElementById('file-custom-row').style.display = 'flex';
+                document.getElementById('file-custom-name').innerText = `📄 ${file.name}`;
+                document.getElementById('file-custom-status').innerText = 'CHỜ KÍCH HOẠT';
+                document.getElementById('file-custom-status').style.color = '#777';
+
+                showToast("Đã hoàn thành nhận diện tệp tin!", "success");
+            };
+            
+            reader.readAsText(file);
+        }
+
+        /* HOẠT ĐỘNG CHẠY INJECT VÀ KHỞI CHẠY PHẦN CHẠY NGẦM */
+        function executeFileInject() {
+            if (systemAccounts[currentUser].tier !== "vip") {
+                showToast("Chức năng chỉ hoạt động trên tài khoản VIP!", "error");
+                return;
+            }
+            if (!loadedFileData.name) {
+                showToast("Không tìm thấy dữ liệu tệp cấu hình hợp lệ!", "error");
+                return;
+            }
+
+            const term = document.getElementById('term-box');
+            term.style.display = 'block';
+            term.innerText = `👉 [VIP INJECTOR] Đang nạp tệp tin: ${loadedFileData.name}...\n`;
+            
+            setTimeout(() => {
+                term.innerText += `[INFO] Trạng thái kiểm định lúc nạp: ${loadedFileData.isGood ? 'CHẤT LƯỢNG TỐT' : 'CHẤT LƯỢNG KÉM'}\n`;
+                term.innerText += `[INFO] Phân giải hoàn tất cấu trúc ${loadedFileData.lines} dòng lệnh.\n`;
+                
+                if (!loadedFileData.isGood) {
+                    term.innerText += `[WARN] Cảnh báo: File không đạt tiêu chuẩn tối ưu nâng cao. Hệ thống sẽ chạy bộ lọc đệm tự động.\n`;
+                }
+
+                term.innerText += `🔥 HOÀN THÀNH: Tải module thành công. Đang chuyển giao vào phân vùng chạy ngầm thiết bị...\n`;
+                
+                // Đổi trạng thái bảng hiển thị file
+                document.getElementById('file-custom-status').innerText = 'ĐANG CHẠY NGẦM';
+                document.getElementById('file-custom-status').style.color = 'var(--green)';
+                document.getElementById('file-custom-row').style.borderLeftColor = 'var(--green)';
+
+                // Kích hoạt giao diện luồng chạy ngầm cục bộ
+                startBackgroundServiceSim();
+
+                showToast(`Đã kích hoạt dịch vụ chạy ngầm cho: ${loadedFileData.name}`, "vip");
+            }, 800);
+        }
+
+        /* GIẢ LẬP LUỒNG HOẠT ĐỘNG CHẠY NGẦM LIÊN TỤC */
+        function startBackgroundServiceSim() {
+            const serviceBox = document.getElementById('bg-service-status');
+            const serviceDetails = document.getElementById('bg-service-details');
+            serviceBox.style.display = 'block';
+            
+            if (bgServiceInterval) clearInterval(bgServiceInterval);
+            bgCycleCount = 0;
+
+            bgServiceInterval = setInterval(() => {
+                bgCycleCount++;
+                // Giả lập thông số tài nguyên thay đổi nhẹ khi chạy ngầm liên tục
+                const fakeRam = (14.2 + Math.sin(bgCycleCount) * 1.5).toFixed(1);
+                
+                serviceDetails.innerHTML = `
+                    • Tệp đang duy trì: <span style="color:var(--accent);">${loadedFileData.name}</span><br>
+                    • RAM tiêu thụ: <span style="color:#fff;">${fakeRam} MB</span><br>
+                    • Chu kỳ tối ưu ngầm: <span style="color:var(--gold);">${bgCycleCount} vòng quét</span><br>
+                    • Chế độ kiểm soát: <span style="color:#fff;">${loadedFileData.isGood ? 'Tối ưu hóa phản xạ 100%' : 'Bù đắp dữ liệu nền cơ bản'}</span>
+                `;
+            }, 2000);
         }
 
         function openDepositModal() {
@@ -510,7 +739,6 @@
                 if (data && data.data && data.data.records) {
                     const records = data.data.records;
                     
-                    // Chỉ tìm các giao dịch thực sự khớp cả Nội dung (Memo) và Số tiền nhận được (amount)
                     const matchTransaction = records.find(item => {
                         const description = item.description ? item.description.toUpperCase() : "";
                         return description.includes(targetMemo.toUpperCase()) && item.amount >= targetAmount;
@@ -527,7 +755,7 @@
                         showToast("Chưa thấy tiền vào tài khoản hoặc sai nội dung chuyển khoản. Hãy đợi 1 phút rồi bấm lại!", "error");
                     }
                 } else {
-                    showToast("Cổng phản hồi lỗi hoặc sai Token API Casso!", "error");
+                    showToast("Cổng phản lỗi hoặc sai Token API Casso!", "error");
                 }
             })
             .catch(err => {
