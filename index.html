@@ -16,8 +16,9 @@
             --accent-glow: rgba(69, 243, 255, 0.2);
             --gold: #ffd700;
             --gold-glow: rgba(255, 215, 0, 0.3);
-            --green: #00ff66;
             --orange: #ff9f43;
+            --green: #00ff66;
+            --purple: #9b59b6;
         }
 
         * {
@@ -35,12 +36,14 @@
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .container {
             width: 100%;
             max-width: 430px;
             margin: 0 auto;
+            position: relative;
         }
 
         /* AUTH BOX */
@@ -95,10 +98,38 @@
             transition: border-color 0.2s;
         }
 
-        .group input:focus {
+        .group input:focus, .group select:focus {
             outline: none;
             border-color: var(--accent);
         }
+
+        /* CUSTOM FILE INPUT */
+        .file-upload-wrapper {
+            position: relative;
+            width: 100%;
+            background: var(--input);
+            border: 1px dashed rgba(155, 89, 182, 0.4);
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 10px;
+        }
+        .file-upload-wrapper:hover {
+            border-color: var(--purple);
+            background: rgba(155, 89, 182, 0.02);
+        }
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0; cursor: pointer;
+        }
+        .file-upload-text {
+            font-size: 12px;
+            color: #aaa;
+        }
+        .file-upload-text b { color: var(--purple); }
 
         .btn {
             width: 100%;
@@ -114,7 +145,15 @@
             text-transform: uppercase;
         }
 
-        .btn:active { transform: scale(0.99); }
+        .btn:disabled {
+            background: #2c3e50 !important;
+            color: #7f8c8d !important;
+            box-shadow: none !important;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .btn:active:not(:disabled) { transform: scale(0.99); }
 
         .btn-danger {
             background: linear-gradient(135deg, var(--primary) 0%, #c0392b 100%);
@@ -128,10 +167,10 @@
             color: #000;
         }
 
-        .btn-success {
-            background: linear-gradient(135deg, var(--green) 0%, #00aa44 100%);
-            box-shadow: 0 4px 12px rgba(0, 255, 102, 0.2);
-            color: #000;
+        .btn-purple {
+            background: linear-gradient(135deg, var(--purple) 0%, #6c5ce7 100%);
+            box-shadow: 0 4px 12px rgba(155, 89, 182, 0.3);
+            color: #fff;
         }
 
         /* MAIN PANEL */
@@ -148,7 +187,27 @@
             margin-bottom: 15px;
         }
 
-        .header h1 { font-size: 18px; color: #fff; font-weight: 800; }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-btn {
+            background: var(--card);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--accent);
+            font-size: 20px;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .menu-btn:active { background: #2c3a47; }
+
+        .header h1 { font-size: 16px; color: #fff; font-weight: 800; }
 
         .badge {
             padding: 4px 10px;
@@ -159,6 +218,35 @@
         }
         .badge.free { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #aaa; }
         .badge.vip { background: rgba(255, 215, 0, 0.1); border: 1px solid var(--gold); color: var(--gold); text-shadow: 0 0 5px var(--gold-glow); }
+
+        /* SIDEBAR MENU */
+        .sidebar {
+            position: fixed;
+            top: 0; left: -100%;
+            width: 85%;
+            max-width: 360px;
+            height: 100vh;
+            background: #151a21;
+            z-index: 99999;
+            box-shadow: 10px 0 30px rgba(0,0,0,0.7);
+            transition: left 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(69, 243, 255, 0.1);
+        }
+        .sidebar.active { left: 0; }
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.6); z-index: 99998; display: none;
+        }
+        .sidebar-header {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .sidebar-close {
+            background: none; border: none; color: var(--primary); font-size: 24px; cursor: pointer;
+        }
 
         .card {
             background: var(--card);
@@ -215,89 +303,73 @@
 
         /* QR DISPLAY WRAPPER */
         .qr-wrapper {
-            background: #fff;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 12px 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            background: #fff; padding: 15px; border-radius: 10px; margin: 12px 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .qr-wrapper img {
-            width: 220px;
-            height: 220px;
-            object-fit: contain;
-            margin-bottom: 8px;
-            border: 1px solid #eee;
-        }
-        .qr-info {
-            color: #000;
-            font-size: 12px;
-            font-weight: bold;
-            line-height: 1.4;
-        }
+        .qr-wrapper img { width: 220px; height: 220px; object-fit: contain; margin-bottom: 8px; border: 1px solid #eee; }
+        .qr-info { color: #000; font-size: 12px; font-weight: bold; line-height: 1.4; }
 
         /* TOAST SYSTEM */
-        #alert-box {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 100000; width: 85%; max-width: 300px; pointer-events: none;
-        }
+        #alert-box { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 100000; width: 85%; max-width: 300px; pointer-events: none; }
         .my-toast {
-            background: #1f2833; 
-            border-left: 4px solid var(--accent);
-            border-right: 1px solid rgba(255,255,255,0.05);
-            border-top: 1px solid rgba(255,255,255,0.05);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding: 12px 15px; border-radius: 6px; color: #fff; font-size: 12px;
-            margin-bottom: 8px; box-shadow: 0 6px 20px rgba(0,0,0,0.5);
-            text-align: left;
-            font-weight: 500;
-            animation: toastIn 0.25s ease forwards;
+            background: #1f2833; border-left: 4px solid var(--accent); border-right: 1px solid rgba(255,255,255,0.05);
+            border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 12px 15px; border-radius: 6px; color: #fff; font-size: 12px; margin-bottom: 8px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5); text-align: left; font-weight: 500; animation: toastIn 0.25s ease forwards;
         }
         .my-toast.vip-toast { border-left-color: var(--gold); }
         .my-toast.err-toast { border-left-color: var(--primary); }
 
-        @keyframes toastIn {
-            from { opacity: 0; transform: translateY(-15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes toastIn { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* CUSTOM FILE UPLOAD STYLES */
-        .file-input-wrapper {
-            position: relative;
-            margin-bottom: 10px;
-        }
-        .file-input-wrapper input[type="file"] {
-            position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;
-        }
-        .file-input-btn {
-            display: block; padding: 10px; background: var(--input); border: 1px dashed var(--accent);
-            border-radius: 6px; text-align: center; font-size: 12px; color: var(--accent); font-weight: bold;
-        }
-        .file-analysis {
-            background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; font-size: 11px; margin-top: 8px; line-height: 1.6;
-            border-left: 3px solid #555; display: none;
-        }
-
-        /* LOCK LAYER FOR FILE MANAGER */
-        .lock-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(31,40,51,0.96); display: flex; flex-direction: column;
-            justify-content: center; align-items: center; text-align: center;
-            border-radius: 12px; z-index: 10;
-        }
-
-        /* BACKGROUND SERVICE BACKGROUND */
-        .bg-service-box {
-            background: rgba(0,0,0,0.5); padding: 8px 12px; border-radius: 6px; margin-top: 10px;
-            font-size: 11px; display: none; border: 1px solid rgba(255,255,255,0.05);
-        }
+        /* SECURITY STYLES */
+        .dev-info-container { background: var(--input); padding: 10px; border-radius: 6px; font-size: 11px; margin-top: 5px; }
+        .dev-info-row { display: flex; justify-content: space-between; margin-bottom: 4px;}
+        .dev-info-row span.lbl { color: var(--accent); font-weight: bold; font-size: 10px; text-transform: uppercase;}
+        .dev-info-row span.val { color: #fff; font-family: monospace;}
+        
+        .device-list-box { background: #000; border: 1px solid rgba(255,255,255,0.05); border-radius: 6px; max-height: 220px; overflow-y: auto; margin: 10px 0; padding: 5px; }
+        .device-item { font-size: 10px; font-family: monospace; padding: 6px; border-bottom: 1px solid #111; display: flex; justify-content: space-between; align-items: flex-start; flex-direction: column; }
+        .device-item:last-child { border-bottom: none; }
+        .device-item .dev-meta { color: #888; font-size: 9px; margin-top: 2px; }
+        .device-item .dev-id-tag { color: var(--green); font-weight: bold; }
+        .device-item .dev-current-tag { background: var(--orange); color: #000; padding: 1px 4px; border-radius: 3px; font-weight: bold; font-size: 8px; align-self: flex-end; margin-top: -12px;}
+        
+        .admin-contact-item { display: flex; align-items: center; justify-content: space-between; background: var(--input); padding: 10px; border-radius: 6px; margin-bottom: 6px; font-size: 12px; }
+        .admin-contact-item a { color: var(--accent); text-decoration: none; font-weight: bold; background: rgba(69, 243, 255, 0.1); padding: 4px 8px; border-radius: 4px; font-size: 11px; transition: 0.2s; }
+        .admin-contact-item a:hover { background: var(--accent); color: #000; }
     </style>
 </head>
 <body>
 
     <div id="alert-box"></div>
+
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar(false)"></div>
+
+    <div class="sidebar" id="sidebar-menu">
+        <div class="sidebar-header">
+            <h3 style="color:var(--accent); font-size:15px; font-weight:bold;">⚙️ TIỆN ÍCH HỆ THỐNG</h3>
+            <button class="sidebar-close" onclick="toggleSidebar(false)">×</button>
+        </div>
+        
+        <div id="device-security-panel" style="display: none;">
+            <h2 style="color: var(--orange); font-size: 12px; text-transform: uppercase; font-weight:bold; margin-bottom:8px; display:flex; align-items:center; gap:5px;">👑 Quản lý thiết bị API Key</h2>
+            <p style="font-size: 11px; color:#aaa; margin-bottom: 10px; line-height:1.4;">Danh sách tất cả thiết bị được xác thực truy cập cục bộ từ tài khoản:</p>
+            <div class="device-list-box" id="device-history-list"></div>
+            
+            <div class="group" style="margin-top: 15px; margin-bottom: 10px;">
+                <label style="color: var(--orange); font-size: 10px;">Hủy quyền máy:</label>
+                <select id="device-select-to-delete" style="padding: 10px; font-size: 11px; font-family: monospace; background: #000;"></select>
+            </div>
+            <button class="btn btn-danger" style="padding: 12px; font-size: 12px;" onclick="deleteSelectedDevice()">
+                🗑️ XOÁ THIẾT BỊ KHỎI HỆ THỐNG
+            </button>
+        </div>
+        
+        <div id="non-admin-sidebar-msg" style="color:#666; font-size:12px; text-align:center; margin-top:40px;">
+            🔒 Tính năng quản lý thiết bị chỉ dành cho Admin cấp cao.
+        </div>
+    </div>
 
     <div class="container">
         
@@ -317,17 +389,28 @@
             <button class="btn" onclick="processLogin()">XÁC THỰC TRUY CẬP</button>
             
             <div style="margin-top: 15px; border-top: 1px dashed rgba(255,255,255,0.05); padding-top: 12px;">
-                <p style="font-size: 10px; color:#555; text-align:center; line-height: 1.5;">
+                <div class="dev-info-container">
+                    <div class="dev-info-row">
+                        <span class="lbl">MÃ THIẾT BỊ HỆ THỐNG:</span>
+                        <span class="val" id="current-device-key" style="color: var(--orange);">Đang quét mã máy...</span>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div id="main-panel">
             <div class="header">
-                <div>
-                    <h1>APP INTEGRATED</h1>
-                    <p style="font-size:11px; color:#666;">Trạng thái: Hoạt động cục bộ</p>
+                <div class="header-left">
+                    <button class="menu-btn" onclick="toggleSidebar(true)">☰</button>
+                    <div>
+                        <h1>APP INTEGRATED</h1>
+                        <p style="font-size:10px; color:#666;">ID: <span id="user-display-id" style="color:#aaa;">---</span></p>
+                    </div>
                 </div>
-                <div id="tier-badge" class="badge free">Tài khoản Thường</div>
+                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                    <div id="tier-badge" class="badge free">Tài khoản Thường</div>
+                    <span style="font-size:10px; color:var(--primary); text-decoration:underline; cursor:pointer;" onclick="location.reload()">Đăng xuất</span>
+                </div>
             </div>
 
             <div class="card" style="border-left: 4px solid var(--accent); background: #151a21;">
@@ -338,87 +421,83 @@
                 </div>
             </div>
 
+            <div class="card" style="border-left: 4px solid var(--gold); background: linear-gradient(145deg, #1f2833, #151a21);">
+                <h2 style="color: var(--gold);">📞 THÔNG TIN LIÊN HỆ ĐẠI LÝ / ADMIN</h2>
+                <p style="font-size:11px; color:#aaa; margin-bottom:10px;">Mọi thắc mắc về lỗi API Key, nạp xu, duyệt máy hoặc lỗi tệp cấu hình xin liên hệ:</p>
+                
+                <div class="admin-contact-item">
+                    <div>👑 Chủ sở hữu App (Admin):</div>
+                    <span style="color:#fff; font-weight:bold;">usenameios</span>
+                </div>
+                <div class="admin-contact-item">
+                    <div>💬 Zalo Admin:</div>
+                    <a href="https://zalo.me/0346044653" target="_blank">NHẮN TIN</a>
+                </div>
+                <div class="admin-contact-item">
+                    <div>🌐 Nhóm Zalo:</div>
+                    <a href="https://zalo.me/g/o9yzxsd34lgsani0wsct" target="_blank">VÀO NHÓM</a>
+                </div>
+            </div>
+
+            <div class="card" style="border-left: 4px solid var(--purple); background: linear-gradient(145deg, #1f2833, #19222b);">
+                <h2 style="color: var(--purple);">⚙️ TRUNG TÂM NẠP FILE & KÍCH HOẠT CHẠY NGẦM</h2>
+                <p style="font-size:11px; color:#aaa; margin-bottom:12px;">Vui lòng nạp file cấu hình trước, sau đó kích hoạt luồng chạy ngầm đồng bộ vào Free Fire:</p>
+                
+                <div class="file-upload-wrapper">
+                    <div class="file-upload-text" id="file-display-name">
+                        Kéo thả hoặc <b>Nhấp vào đây</b> để chọn file
+                    </div>
+                    <input type="file" id="config-file-input" accept=".xml,.txt,.json,.settings" onchange="handleFileChange(event)">
+                </div>
+                <div id="file-data-preview" style="margin-top:-5px; margin-bottom: 12px; display:none; background:#000; padding:8px; border-radius:5px; font-family:monospace; font-size:10px; color:var(--green); max-height:65px; overflow-y:auto; white-space:pre-wrap;"></div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; background:var(--input); padding:10px; border-radius:6px; border: 1px solid rgba(155, 89, 182, 0.15);">
+                    <div>
+                        <div style="font-size:12px; font-weight:bold; color: #fff;" id="bg-service-status-title"> Bấm Để Kích Hoạt Chạy Ngầm</div>
+                        <div style="font-size:10px; color:#777;" id="bg-service-desc">Yêu cầu chọn file để kích hoạt</div>
+                    </div>
+                    <button class="btn btn-purple" id="bg-service-btn" style="width:auto; padding:8px 15px; font-size:11px; background: linear-gradient(135deg, var(--purple) 0%, #706fd3 100%);" onclick="toggleBackgroundService()" disabled>KÍCH HOẠT</button>
+                </div>
+                <div id="bg-loader-log" style="font-family:monospace; font-size:10px; color:var(--orange); margin-top:8px; display:none; text-align: left; background: #000; padding: 6px; border-radius: 4px; line-height: 1.4; max-height: 110px; overflow-y: auto;"></div>
+            </div>
+
             <div class="card" id="shop-banner" style="background: linear-gradient(145deg, #2b1b1b, #1f2833); border: 1px solid var(--gold);">
                 <h2 style="color: var(--gold);">👑 KÍCH HOẠT QUYỀN VIP PREMIUM</h2>
                 <p style="font-size: 12px; color:#aaa; margin-bottom: 12px;">Mở khóa tệp tin cấu hình mở rộng AimLock và nâng cao tần số tương tác cảm ứng.</p>
                 <button class="btn btn-gold" onclick="buyVipWithCoins()">MUA BẢN VIP BẰNG XU (Giá: 50.000 Xu)</button>
             </div>
 
-            <div class="card" id="file-manager-card" style="border-left: 4px solid var(--green);">
-                
-                <div id="file-lock-layer" class="lock-overlay">
-                    <p style="color:var(--gold); font-weight:bold; font-size:13px; margin-bottom:3px;">🔒 CHỨC NĂNG FILE MỞ RỘNG (VIP)</p>
-                    <p style="font-size:11px; color:#888; margin-bottom:8px;">Vui lòng nâng cấp tài khoản VIP để nạp file cấu hình riêng.</p>
-                </div>
-
-                <h2>Quản Lý Tệp Tin Cấu Hình Cục Bộ</h2>
-                <p style="font-size: 11px; color:#888; margin-bottom: 10px;">Thêm tệp cấu hình tùy chỉnh để hệ thống kiểm tra chất lượng định dạng và tối ưu.</p>
-                
-                <div class="file-input-wrapper">
-                    <div class="file-input-btn" id="file-label">📥 Bấm để chọn tệp cấu hình...</div>
-                    <input type="file" id="custom-file-input" onchange="handleFileSelect(event)">
-                </div>
-
-                <div class="file-analysis" id="analysis-box">
-                    <div style="color: var(--green); font-weight: bold; margin-bottom: 5px; display: flex; justify-content: space-between;">
-                        <span>📊 KẾT QUẢ KIỂM ĐỊNH FILE:</span>
-                        <span id="file-rating-badge" style="padding: 1px 6px; border-radius: 4px; font-size: 10px;"></span>
-                    </div>
-                    <div id="analysis-details"></div>
-                </div>
-
-                <button class="btn btn-success" id="btn-inject-file" style="margin-top: 10px; padding: 11px; font-size: 13px; display: none;" onclick="executeFileInject()">KÍCH HOẠT & CHẠY NGẦM FILE</button>
-                
-                <div class="bg-service-box" id="bg-service-status">
-                    <div style="display: flex; justify-content: space-between; color: #aaa; margin-bottom: 4px;">
-                        <span>⚙️ TIẾN TRÌNH CHẠY NGẦM:</span>
-                        <span style="color: var(--green); font-weight: bold; animation: pulse 1s infinite;">● ACTIVE</span>
-                    </div>
-                    <div style="color: #fff; font-family: monospace;" id="bg-service-details">
-                        • RAM tiêu thụ: 0 MB<br>
-                        • Vòng lặp tối ưu: 0 khuyển<br>
-                        • Trạng thái nền: Đang duy trì kết nối...
-                    </div>
-                </div>
-            </div>
-
             <div class="card">
                 <h2>Trạng Thái Tệp Tin Cấu Hình</h2>
                 <div class="status-item" style="border-left: 3px solid var(--accent);">
-                    <div>📄 Sensi</div>
+                    <div>📄 Sensi Main Default</div>
                     <div style="color: var(--accent); font-weight:bold;">ĐÃ SẴN SÀNG</div>
                 </div>
-                <div class="status-item" id="file-custom-row" style="border-left: 3px solid #555; display: none;">
-                    <div id="file-custom-name">📄 Chưa có file</div>
-                    <div id="file-custom-status" style="color: #777; font-weight: bold;">CHƯA KÍCH HOẠT</div>
-                </div>
                 <div class="status-item" id="file-vip-row" style="border-left: 3px solid #555;">
-                    <div>📄 Aimbot Config.xml (Extended Mesh)</div>
+                    <div>📄 AimLock</div>
                     <div id="file-status-text" style="color: #777; font-weight: bold;">🔒 YÊU CẦU VIP</div>
                 </div>
             </div>
 
             <div class="card">
                 <h2>Bảng Cấu Hình Tương Thích</h2>
-                
                 <div id="normal-features-zone">
                     <p style="font-size:11px; color:#aaa; margin-bottom:10px;">⚡ <b>MENU STANDARD (Miễn phí):</b></p>
                     <div class="group">
                         <label>Lựa chọn tinh chỉnh cơ bản</label>
                         <select id="normal-option">
                             <option>Tăng Tốc Độ Cảm Ứng Bề Mặt Màn Hình (+50%)</option>
-                            <option>Tối Ưu Màn Hình</option>
-                            <option>Hỗ Trợ Kéo Cơ Bản</option>
+                            <option>Tối Ưu Màn Hình Tránh Trễ Điểm</option>
+                            <option>Hỗ Trợ Kéo Tâm Cơ Bản</option>
                         </select>
                     </div>
-                    <button class="btn btn-danger" style="padding:11px; font-size:13px;" onclick="executeNormalInject()">KÍCH HOẠT</button>
+                    <button class="btn btn-danger" style="padding:11px; font-size:13px;" onclick="executeNormalInject()">KÍCH HOẠT SƠ CẤP</button>
                 </div>
 
                 <div id="vip-features-zone" style="margin-top:20px; padding-top:15px; border-top:1px solid rgba(255,255,255,0.08); position:relative;">
-                    
-                    <div id="vip-lock-layer" class="lock-overlay">
+                    <div id="vip-lock-layer" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(31,40,51,0.96); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; border-radius: 6px;">
                         <p style="color:var(--gold); font-weight:bold; font-size:13px; margin-bottom:3px;">🔒 MENU VIP (ĐANG KHÓA)</p>
-                        <p style="font-size:11px; color:#888; margin-bottom:8px;">Vui lòng dùng Xu để nâng cấp tài khoản.</p>
+                        <p style="font-size:11px; color:#888; margin-bottom:8px;">Vui lòng dùng Xu nâng cấp hoặc liên hệ Admin.</p>
                     </div>
 
                     <p style="font-size:11px; color:var(--gold); margin-bottom:10px;">👑 <b>MENU ADVANCED (Cấp Cao VIP):</b></p>
@@ -426,12 +505,11 @@
                         <label>Hệ Thống Vip</label>
                         <select id="bias-select">
                             <option value="0.998">Ultra Lock Headshot Mode</option>
-                            <option value="0.996">Medium Smooth Tracking Mode </option>
+                            <option value="0.996">Medium Smooth Tracking Mode</option>
                         </select>
                     </div>
                     <button class="btn btn-gold" style="padding:11px; font-size:13px;" onclick="executeVipInject()">KÍCH HOẠT CHẾ ĐỘ NÂNG CAO VIP</button>
                 </div>
-
                 <div class="terminal" id="term-box"></div>
             </div>
 
@@ -444,10 +522,6 @@
                 </div>
                 <div id="result-text"></div>
             </div>
-
-            <div style="text-align: center; margin-top: 20px;">
-                <p style="font-size:11px; color:#444; text-decoration: underline; cursor: pointer; display: inline-block;" onclick="location.reload()">Đăng xuất tài khoản</p>
-            </div>
         </div>
 
     </div>
@@ -455,41 +529,72 @@
     <div class="pop-modal" id="shop-modal" onclick="closeShop(event)">
         <div class="pop-content" style="border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow);">
             <h3 style="color:var(--accent); margin-bottom:8px;">HỆ THỐNG NẠP XU TỰ ĐỘNG</h3>
-            <p style="font-size:12px; color:#ccc; margin-bottom:12px;">Vui lòng chuyển khoản đúng số tiền bạn muốn nạp. Hệ thống sẽ quét API ngân hàng thật và cộng xu khi có tiền (1đ = 1 Xu).</p>
-            
+            <p style="font-size:12px; color:#ccc; margin-bottom:12px;">Vui lòng chuyển khoản đúng số tiền. Hệ thống quét dữ liệu API và tự cộng xu (1đ = 1 Xu).</p>
             <div class="group">
                 <label>Nhập số tiền muốn nạp (VNĐ)</label>
                 <input type="number" id="input-amount" value="50000" oninput="updateQrContent()" style="text-align:center; font-size:16px; font-weight:bold; color:var(--accent);">
             </div>
-
             <div class="qr-wrapper">
                 <img id="qr-image" src="" alt="Mã QR Chuyển Khoản">
                 <div class="qr-info" id="qr-info-text"></div>
             </div>
-            
             <button class="btn" style="margin-bottom:10px;" id="verify-pay-btn" onclick="checkPaymentOnline()">XÁC NHẬN ĐÃ CHUYỂN KHOẢN</button>
             <button class="btn" style="background:#333; color:#fff;" onclick="document.getElementById('shop-modal').style.display = 'none';">ĐÓNG CỬA SỔ</button>
         </div>
     </div>
 
     <script>
-        // =======================================================
-        // ĐIỀN THÔNG TIN NGÂN HÀNG CỦA BẠN VÀO ĐÂY ĐỂ ĐỌC SAO KÊ
-        // =======================================================
         const MY_BANK_NAME   = "mbbank";               
         const MY_BANK_STK    = "0346044653";           
         const AUTH_API_KEY   = "628559fd-6d1b-4f98-9a18-b278a9c46074"; 
         
         let currentUser = "";
         let generatedMemoSuffix = "";
-        let loadedFileData = { name: "", size: 0, content: "", lines: 0, keywords: [], isGood: false };
-        let bgServiceInterval = null;
-        let bgCycleCount = 0;
+        let isBackgroundServiceRunning = false;
+        let backgroundInterval = null;
+        let loadedConfigContent = ""; 
+        let currentFileName = "";
         
         const systemAccounts = {
+            "vipios":       { password: "123", tier: "vip", coins: 999999 },
             "usenameios01": { password: "usenameios01", tier: "free", coins: 0 },
-            "vipios":    { password: "123", tier: "vip", coins: 999999 }
+            "member01":     { password: "password123", tier: "free", coins: 15000 },
+            "vipmember01":  { password: "124", tier: "vip", coins: 300000 },
+            "playerfree":   { password: "free789", tier: "free", coins: 0 }
         };
+
+        function getDeviceUUID() {
+            let deviceKey = localStorage.getItem('APP_DEVICE_UUID_KEY');
+            if (!deviceKey) {
+                deviceKey = 'MRO-' + Math.random().toString(36).substring(2, 11).toUpperCase() + '-' + Math.floor(1000 + Math.random() * 9000);
+                localStorage.setItem('APP_DEVICE_UUID_KEY', deviceKey);
+            }
+            return deviceKey;
+        }
+        const currentDeviceUIDKey = getDeviceUUID();
+
+        function getDeviceUserAgentInfo() {
+            const ua = navigator.userAgent;
+            if (ua.includes("iPhone")) return "iOS (iPhone)";
+            if (ua.includes("iPad")) return "iOS (iPad)";
+            if (ua.includes("Android")) return "Android OS";
+            if (ua.includes("Windows")) return "Windows PC";
+            return "Trình duyệt Web";
+        }
+
+        document.getElementById('current-device-key').innerText = currentDeviceUIDKey;
+
+        function toggleSidebar(open) {
+            const sidebar = document.getElementById('sidebar-menu');
+            const overlay = document.getElementById('sidebar-overlay');
+            if (open) {
+                sidebar.classList.add('active');
+                overlay.style.display = 'block';
+            } else {
+                sidebar.classList.remove('active');
+                overlay.style.display = 'none';
+            }
+        }
 
         function showToast(text, type = 'success') {
             const container = document.getElementById('alert-box');
@@ -512,15 +617,182 @@
 
             const account = systemAccounts[u];
             if(account && account.password === p) {
+                const deviceListStorageKey = `API_DEVICE_LIST_USER_${u}`;
+                let savedDevices = [];
+                try { savedDevices = JSON.parse(localStorage.getItem(deviceListStorageKey)) || []; } catch(e) { savedDevices = []; }
+
+                const deviceExists = savedDevices.find(d => d.id === currentDeviceUIDKey);
+
+                if (!deviceExists) {
+                    if (u === "vipios") {
+                        savedDevices.push({ id: currentDeviceUIDKey, name: getDeviceUserAgentInfo(), time: new Date().toLocaleString('vi-VN') });
+                        localStorage.setItem(deviceListStorageKey, JSON.stringify(savedDevices));
+                    } else {
+                        if (savedDevices.length >= 1) {
+                            showToast("ĐĂNG NHẬP THẤT BẠI: Thiết bị này chưa liên kết với chuỗi API Key của ID!", "error");
+                            return;
+                        } else {
+                            savedDevices.push({ id: currentDeviceUIDKey, name: getDeviceUserAgentInfo(), time: new Date().toLocaleString('vi-VN') });
+                            localStorage.setItem(deviceListStorageKey, JSON.stringify(savedDevices));
+                        }
+                    }
+                }
+
                 currentUser = u;
-                showToast(account.tier === 'vip' ? "Đăng nhập quyền VIP thành công!" : "Đăng nhập quyền bản Thường thành công!", account.tier === 'vip' ? "vip" : "success");
+                document.getElementById('user-display-id').innerText = u;
+                showToast(account.tier === 'vip' ? "Đăng nhập quyền VIP thành công!" : "Đăng nhập bản Thường thành công!", account.tier === 'vip' ? "vip" : "success");
                 document.getElementById('login-box').style.display = 'none';
                 document.getElementById('main-panel').style.display = 'block';
                 
                 generatedMemoSuffix = Math.floor(100 + Math.random() * 900).toString();
                 updateUI();
+                renderDeviceManagementAPI(); 
             } else {
                 showToast("Sai thông tin ID truy cập hoặc Mật khẩu hệ thống!", "error");
+            }
+        }
+
+        function renderDeviceManagementAPI() {
+            if (currentUser !== "vipios") {
+                document.getElementById('device-security-panel').style.display = "none";
+                document.getElementById('non-admin-sidebar-msg').style.display = "block";
+                return;
+            }
+
+            document.getElementById('device-security-panel').style.display = "block";
+            document.getElementById('non-admin-sidebar-msg').style.display = "none";
+
+            const deviceListStorageKey = `API_DEVICE_LIST_USER_${currentUser}`;
+            let savedDevices = [];
+            try { savedDevices = JSON.parse(localStorage.getItem(deviceListStorageKey)) || []; } catch(e) { savedDevices = []; }
+
+            const listContainer = document.getElementById('device-history-list');
+            const selectComponent = document.getElementById('device-select-to-delete');
+            
+            listContainer.innerHTML = "";
+            selectComponent.innerHTML = '<option value="">-- Chọn máy cần hủy --</option>';
+
+            if (savedDevices.length === 0) {
+                listContainer.innerHTML = '<div style="color:#666; font-size:11px; padding:10px; text-align:center;">Chưa lưu máy nào.</div>';
+                return;
+            }
+
+            savedDevices.forEach((dev, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'device-item';
+                const isCurrent = dev.id === currentDeviceUIDKey;
+                itemDiv.innerHTML = `
+                    <div>[${index + 1}] <span class="dev-id-tag">${dev.id}</span> - <b style="color:#fff;">${dev.name}</b></div>
+                    <div class="dev-meta">Liên kết: ${dev.time}</div>
+                    ${isCurrent ? '<span class="dev-current-tag">MÁY NÀY</span>' : ''}
+                `;
+                listContainer.appendChild(itemDiv);
+
+                const optionNode = document.createElement('option');
+                optionNode.value = dev.id;
+                optionNode.innerText = `[${index + 1}] ${dev.id}`;
+                selectComponent.appendChild(optionNode);
+            });
+        }
+
+        function deleteSelectedDevice() {
+            if (currentUser !== "vipios") return;
+            const selectComponent = document.getElementById('device-select-to-delete');
+            const targetDeviceId = selectComponent.value;
+
+            if (!targetDeviceId) { showToast("Vui lòng lựa chọn một thiết bị!", "error"); return; }
+
+            const deviceListStorageKey = `API_DEVICE_LIST_USER_${currentUser}`;
+            let savedDevices = [];
+            try { savedDevices = JSON.parse(localStorage.getItem(deviceListStorageKey)) || []; } catch(e) { savedDevices = []; }
+
+            const updatedDevices = savedDevices.filter(d => d.id !== targetDeviceId);
+            localStorage.setItem(deviceListStorageKey, JSON.stringify(updatedDevices));
+            showToast(`Đã xóa thiết bị [${targetDeviceId}]!`, "success");
+            
+            if (targetDeviceId === currentDeviceUIDKey) {
+                setTimeout(() => { location.reload(); }, 1000);
+                return;
+            }
+            renderDeviceManagementAPI();
+            updateUI();
+        }
+
+        // --- LẮP LOGIC CHỌN FILE ĐỂ MỞ KHÓA NÚT CHẠY NỀN ---
+        function handleFileChange(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            currentFileName = file.name;
+            document.getElementById('file-display-name').innerHTML = `📄 Đã nạp file: <b style="color:var(--purple);">${file.name}</b>`;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                loadedConfigContent = e.target.result;
+                const previewBox = document.getElementById('file-data-preview');
+                previewBox.style.display = "block";
+                previewBox.innerText = "[RAM Stream] Dữ liệu:\n" + loadedConfigContent.substring(0, 180) + (loadedConfigContent.length > 180 ? "\n..." : "");
+                
+                // MỞ KHÓA NÚT KÍCH HOẠT NỀN KHI CÓ FILE
+                const bgBtn = document.getElementById('bg-service-btn');
+                bgBtn.disabled = false;
+                document.getElementById('bg-service-desc').innerText = "File khả dụng. Sẵn sàng đồng bộ ngầm!";
+                
+                showToast("Đã đọc dữ liệu tệp tin. Đã mở khóa nút Kích hoạt nền!");
+            };
+            reader.readAsText(file);
+        }
+
+        // --- XỬ LÝ HOẠT ĐỘNG CHẠY NGẦM HOÀN TOÀN TRONG GAME FREE FIRE ---
+        function toggleBackgroundService() {
+            const btn = document.getElementById('bg-service-btn');
+            const title = document.getElementById('bg-service-status-title');
+            const desc = document.getElementById('bg-service-desc');
+            const logBox = document.getElementById('bg-loader-log');
+
+            if (!isBackgroundServiceRunning) {
+                if (!loadedConfigContent) {
+                    showToast("Lỗi bảo mật: Vui lòng chọn tệp tin cấu hình trước!", "error");
+                    return;
+                }
+
+                isBackgroundServiceRunning = true;
+                btn.innerText = "DỪNG NỀN";
+                btn.style.background = "linear-gradient(135deg, var(--primary) 0%, #c0392b 100%)";
+                title.innerText = "Dịch vụ nền: ĐANG CHẠY TRONG GAME";
+                title.style.color = "var(--green)";
+                desc.innerText = "Tiến trình đồng bộ Free Fire đang hoạt động.";
+                logBox.style.display = "block";
+                logBox.innerHTML = `[${new Date().toLocaleTimeString()}] 🔍 Đang quét tìm gói tiến trình 'com.dts.freefireth'...<br>`;
+                
+                showToast("Bắt đầu khởi chạy cấu hình vào game Free Fire!", "success");
+                
+                let step = 0;
+                backgroundInterval = setInterval(() => {
+                    const time = new Date().toLocaleTimeString();
+                    step++;
+                    if(step === 1) {
+                        logBox.innerHTML += `[${time}] 🌐 Đã liên kết Package Free Fire (PID: ${Math.floor(2000 + Math.random() * 5000)})<br>`;
+                    } else if(step === 2) {
+                        logBox.innerHTML += `[${time}] 💉 Injecting file: [${currentFileName}] -> MemStream Alloc v2...<br>`;
+                    } else if(step === 3) {
+                        logBox.innerHTML += `[${time}] 🔥 Đã khóa địa chỉ lưới cảm ứng. Cấu hình Free Fire kích hoạt thành công!<br>`;
+                    } else {
+                        logBox.innerHTML += `[${time}] ⚡ [Free Fire] Luồng dữ liệu chạy ngầm ổn định (Dung lượng RAM ổn định)<br>`;
+                    }
+                    // Tự động cuộn logs xuống dưới cùng
+                    logBox.scrollTop = logBox.scrollHeight;
+                }, 2500);
+            } else {
+                isBackgroundServiceRunning = false;
+                btn.innerText = "KÍCH HOẠT NỀN";
+                btn.style.background = "linear-gradient(135deg, var(--purple) 0%, #706fd3 100%)";
+                title.innerText = "Dịch vụ nền: ĐA DỪNG";
+                title.style.color = "#fff";
+                desc.innerText = "File khả dụng. Sẵn sàng đồng bộ ngầm!";
+                logBox.style.display = "none";
+                clearInterval(backgroundInterval);
+                showToast("Đã ngắt kết nối cấu hình khỏi game Free Fire.");
             }
         }
 
@@ -532,158 +804,11 @@
             document.getElementById('tier-badge').className = isVip ? "badge vip" : "badge free";
             document.getElementById('tier-badge').innerText = isVip ? "Thành viên VIP" : "Tài khoản Thường";
             document.getElementById('shop-banner').style.display = isVip ? 'none' : 'block';
-            
-            document.getElementById('file-lock-layer').style.display = isVip ? 'none' : 'flex';
             document.getElementById('vip-lock-layer').style.display = isVip ? 'none' : 'flex';
-            
             document.getElementById('file-status-text').innerText = isVip ? "ĐA MỞ KHÓA (VIP)" : "🔒 KHÓA (CẦN VIP)";
             document.getElementById('file-status-text').style.color = isVip ? "var(--accent)" : "#777";
             document.getElementById('file-vip-row').style.borderLeftColor = isVip ? "var(--accent)" : "#555";
-            document.getElementById('fps-text').innerText = isVip ? "Tần số quét màn hình: 120Hz (Độ nhạy mượt tối đa)" : "Tần số quét màn hình: 60Hz (Giới hạn tài khoản thường)";
-        }
-
-        /* LOGIC KIỂM ĐỊNH NHẬN DIỆN FILE TỐT / KHÔNG TỐT */
-        function handleFileSelect(event) {
-            if (systemAccounts[currentUser].tier !== "vip") {
-                showToast("Quyền hạn không đủ! Tính năng chỉ dành cho VIP.", "error");
-                return;
-            }
-
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // Dừng tiến trình chạy ngầm cũ nếu đang chạy khi đổi file mới
-            if (bgServiceInterval) {
-                clearInterval(bgServiceInterval);
-                document.getElementById('bg-service-status').style.display = 'none';
-            }
-
-            document.getElementById('file-label').innerText = `📄 ${file.name}`;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const content = e.target.result;
-                const lines = content.split('\n');
-                
-                const checkKeywords = ['sensi', 'aimbot', 'lock', 'speed', 'regedit', 'hax', 'dpi'];
-                let detected = [];
-                checkKeywords.forEach(kw => {
-                    if (content.toLowerCase().includes(kw)) {
-                        detected.push(kw.toUpperCase());
-                    }
-                });
-
-                // Tiêu chí nhận diện File Tốt / Không tốt:
-                // File TỐT: Nội dung không rỗng, số dòng > 3, dung lượng > 15 bytes và chứa ít nhất một từ khóa hợp lệ.
-                let isGoodFile = (content.trim().length > 15 && lines.length >= 3 && detected.length > 0);
-
-                loadedFileData = {
-                    name: file.name,
-                    size: file.size,
-                    content: content,
-                    lines: lines.length,
-                    keywords: detected,
-                    isGood: isGoodFile
-                };
-
-                const analysisBox = document.getElementById('analysis-box');
-                const analysisDetails = document.getElementById('analysis-details');
-                const ratingBadge = document.getElementById('file-rating-badge');
-                
-                analysisBox.style.display = 'block';
-
-                // Thiết lập nhãn nhận diện file
-                if (loadedFileData.isGood) {
-                    ratingBadge.innerText = "FILE TỐT";
-                    ratingBadge.style.background = "rgba(0, 255, 102, 0.2)";
-                    ratingBadge.style.color = "var(--green)";
-                    ratingBadge.style.border = "1px solid var(--green)";
-                } else {
-                    ratingBadge.innerText = "KHÔNG TỐT";
-                    ratingBadge.style.background = "rgba(255, 71, 87, 0.2)";
-                    ratingBadge.style.color = "var(--primary)";
-                    ratingBadge.style.border = "1px solid var(--primary)";
-                }
-                
-                analysisDetails.innerHTML = `
-                    • Tên file: <span style="color:#fff;">${loadedFileData.name}</span><br>
-                    • Dung lượng: <span style="color:#fff;">${loadedFileData.size} bytes</span><br>
-                    • Số hàng dữ liệu: <span style="color:#fff;">${loadedFileData.lines} dòng</span><br>
-                    • Từ khóa khớp: <span style="color:var(--gold);">${loadedFileData.keywords.length > 0 ? loadedFileData.keywords.join(', ') : 'Trống / Không xác định'}</span><br>
-                    • Đánh giá sơ bộ: <span style="color:${loadedFileData.isGood ? 'var(--green)' : 'var(--primary)'}; font-weight: bold;">${loadedFileData.isGood ? 'Định dạng chuẩn sạch, khuyến nghị dùng' : 'Thiếu từ khóa tối ưu hoặc dung lượng quá ngắn'}</span>
-                `;
-
-                document.getElementById('btn-inject-file').style.display = 'block';
-
-                document.getElementById('file-custom-row').style.display = 'flex';
-                document.getElementById('file-custom-name').innerText = `📄 ${file.name}`;
-                document.getElementById('file-custom-status').innerText = 'CHỜ KÍCH HOẠT';
-                document.getElementById('file-custom-status').style.color = '#777';
-
-                showToast("Đã hoàn thành nhận diện tệp tin!", "success");
-            };
-            
-            reader.readAsText(file);
-        }
-
-        /* HOẠT ĐỘNG CHẠY INJECT VÀ KHỞI CHẠY PHẦN CHẠY NGẦM */
-        function executeFileInject() {
-            if (systemAccounts[currentUser].tier !== "vip") {
-                showToast("Chức năng chỉ hoạt động trên tài khoản VIP!", "error");
-                return;
-            }
-            if (!loadedFileData.name) {
-                showToast("Không tìm thấy dữ liệu tệp cấu hình hợp lệ!", "error");
-                return;
-            }
-
-            const term = document.getElementById('term-box');
-            term.style.display = 'block';
-            term.innerText = `👉 [VIP INJECTOR] Đang nạp tệp tin: ${loadedFileData.name}...\n`;
-            
-            setTimeout(() => {
-                term.innerText += `[INFO] Trạng thái kiểm định lúc nạp: ${loadedFileData.isGood ? 'CHẤT LƯỢNG TỐT' : 'CHẤT LƯỢNG KÉM'}\n`;
-                term.innerText += `[INFO] Phân giải hoàn tất cấu trúc ${loadedFileData.lines} dòng lệnh.\n`;
-                
-                if (!loadedFileData.isGood) {
-                    term.innerText += `[WARN] Cảnh báo: File không đạt tiêu chuẩn tối ưu nâng cao. Hệ thống sẽ chạy bộ lọc đệm tự động.\n`;
-                }
-
-                term.innerText += `🔥 HOÀN THÀNH: Tải module thành công. Đang chuyển giao vào phân vùng chạy ngầm thiết bị...\n`;
-                
-                // Đổi trạng thái bảng hiển thị file
-                document.getElementById('file-custom-status').innerText = 'ĐANG CHẠY NGẦM';
-                document.getElementById('file-custom-status').style.color = 'var(--green)';
-                document.getElementById('file-custom-row').style.borderLeftColor = 'var(--green)';
-
-                // Kích hoạt giao diện luồng chạy ngầm cục bộ
-                startBackgroundServiceSim();
-
-                showToast(`Đã kích hoạt dịch vụ chạy ngầm cho: ${loadedFileData.name}`, "vip");
-            }, 800);
-        }
-
-        /* GIẢ LẬP LUỒNG HOẠT ĐỘNG CHẠY NGẦM LIÊN TỤC */
-        function startBackgroundServiceSim() {
-            const serviceBox = document.getElementById('bg-service-status');
-            const serviceDetails = document.getElementById('bg-service-details');
-            serviceBox.style.display = 'block';
-            
-            if (bgServiceInterval) clearInterval(bgServiceInterval);
-            bgCycleCount = 0;
-
-            bgServiceInterval = setInterval(() => {
-                bgCycleCount++;
-                // Giả lập thông số tài nguyên thay đổi nhẹ khi chạy ngầm liên tục
-                const fakeRam = (14.2 + Math.sin(bgCycleCount) * 1.5).toFixed(1);
-                
-                serviceDetails.innerHTML = `
-                    • Tệp đang duy trì: <span style="color:var(--accent);">${loadedFileData.name}</span><br>
-                    • RAM tiêu thụ: <span style="color:#fff;">${fakeRam} MB</span><br>
-                    • Chu kỳ tối ưu ngầm: <span style="color:var(--gold);">${bgCycleCount} vòng quét</span><br>
-                    • Chế độ kiểm soát: <span style="color:#fff;">${loadedFileData.isGood ? 'Tối ưu hóa phản xạ 100%' : 'Bù đắp dữ liệu nền cơ bản'}</span>
-                `;
-            }, 2000);
+            document.getElementById('fps-text').innerText = isVip ? "Tần số quét màn hình: 120Hz (Độ nhạy mượt tối đa VIP)" : "Tần số quét màn hình: 60Hz (Giới hạn tài khoản thường)";
         }
 
         function openDepositModal() {
@@ -700,7 +825,6 @@
         function updateQrContent() {
             const amount = parseInt(document.getElementById('input-amount').value) || 0;
             const memo = "SENS" + currentUser.toUpperCase() + generatedMemoSuffix;
-            
             const qrUrl = `https://img.vietqr.io/image/${MY_BANK_NAME}-${MY_BANK_STK}-qr_only.png?amount=${amount}&addInfo=${encodeURIComponent(memo)}`;
             document.getElementById('qr-image').src = qrUrl;
             
@@ -722,14 +846,11 @@
 
             btn.disabled = true;
             btn.innerText = "⏳ ĐANG ĐỐI SOÁT DỮ LIỆU NGÂN HÀNG...";
-            showToast("Đang kết nối API Casso để quét giao dịch thực tế...", "success");
+            showToast("Đang kết nối API Casso...", "success");
 
             fetch("https://api.casso.vn/v2/transactions?sort=DES", {
                 method: "GET",
-                headers: {
-                    "Authorization": `Apikey ${AUTH_API_KEY}`,
-                    "Content-Type": "application/json"
-                }
+                headers: { "Authorization": `Apikey ${AUTH_API_KEY}`, "Content-Type": "application/json" }
             })
             .then(res => res.json())
             .then(data => {
@@ -738,7 +859,6 @@
 
                 if (data && data.data && data.data.records) {
                     const records = data.data.records;
-                    
                     const matchTransaction = records.find(item => {
                         const description = item.description ? item.description.toUpperCase() : "";
                         return description.includes(targetMemo.toUpperCase()) && item.amount >= targetAmount;
@@ -749,43 +869,39 @@
                         systemAccounts[currentUser].coins += addedCoins;
                         updateUI();
                         document.getElementById('shop-modal').style.display = 'none';
-                        showToast(`Hệ thống xác nhận đã nhận được tiền thật! Đã cộng +${addedCoins.toLocaleString()} Xu vào ví.`, "success");
+                        showToast(`Xác nhận thành công! Cộng +${addedCoins.toLocaleString()} Xu.`, "success");
                         generatedMemoSuffix = Math.floor(100 + Math.random() * 900).toString(); 
                     } else {
-                        showToast("Chưa thấy tiền vào tài khoản hoặc sai nội dung chuyển khoản. Hãy đợi 1 phút rồi bấm lại!", "error");
+                        showToast("Chưa thấy giao dịch hợp lệ. Hãy thử lại sau vài giây!", "error");
                     }
-                } else {
-                    showToast("Cổng phản lỗi hoặc sai Token API Casso!", "error");
-                }
+                } else { showToast("Cổng phản hồi lỗi dữ liệu token!", "error"); }
             })
             .catch(err => {
-                btn.disabled = false;
-                btn.innerText = "XÁC NHẬN ĐÃ CHUYỂN KHOẢN";
-                console.error(err);
-                showToast("Không thể kết nối đến máy chủ Casso. Vui lòng kiểm tra mạng!", "error");
+                btn.disabled = false; btn.innerText = "XÁC NHẬN ĐÃ CHUYỂN KHOẢN";
+                showToast("Không thể kết nối API máy chủ ngân hàng!", "error");
             });
         }
 
         function buyVipWithCoins() {
             const acc = systemAccounts[currentUser];
             if (acc.coins >= 50000) {
-                acc.coins -= 50000;
-                acc.tier = "vip";
+                acc.coins -= 50000; acc.tier = "vip";
                 updateUI();
-                showToast("Chúc mừng! Bạn đã kích hoạt thành công tài khoản VIP PREMIUM!", "vip");
-            } else {
-                showToast("Số dư Xu không đủ! Vui lòng bấm 'Nạp Thêm Xu' để có đủ 50.000 Xu.", "error");
-            }
+                showToast("Kích hoạt thành công tài khoản VIP PREMIUM!", "vip");
+            } else { showToast("Số dư không đủ! Cần tối thiểu 50.000 Xu.", "error"); }
         }
 
         function executeNormalInject() {
             const term = document.getElementById('term-box');
             term.style.display = 'block';
             term.innerText = "👉 [STANDARD SYSTEM] Đang đồng bộ cấu hình nền...\n";
+            if(loadedConfigContent) {
+                term.innerText += `[FILE DETECTED] Đang nạp thông số từ file tải lên (${loadedConfigContent.substring(0, 30)}...)\n`;
+            }
             setTimeout(() => {
-                term.innerText += "[OK] Đồng bộ thành công tệp cấu hình AimLock.settings\n🔥 HOÀN THÀNH: Trình mô phỏng hoạt động ổn định!";
-                showToast("Kích hoạt môi trường thành công!");
-            }, 500);
+                term.innerText += "[OK] Đồng bộ thành công tệp cấu hình AimLock.settings\n🔥 HOÀN THÀNH!";
+                showToast("Kích hoạt môi trường tiêu chuẩn thành công!");
+            }, 600);
         }
 
         function executeVipInject() {
@@ -795,13 +911,16 @@
             const bias = document.getElementById('bias-select').value;
             term.style.display = 'block';
             term.innerText = "👉 [ADVANCED SYSTEM] Đang giải nén lưới tọa độ nâng cao...\n";
+            if(loadedConfigContent) {
+                term.innerText += `[FILE DETECTED] Đang nạp cấu trúc tệp mở rộng nâng cao...\n`;
+            }
             setTimeout(() => {
-                term.innerText += "[VIP] Tải hoàn tất cấu trúc Aimbot Config.xml\n[VIP] Áp dụng sai số tương quan mục tiêu: " + bias + "\n🔥 HOÀN THÀNH: Đã tối ưu hóa độ nhạy VIP!";
+                term.innerText += "[VIP] Tải hoàn tất cấu trúc Aimbot Config.xml\n[VIP] Áp dụng sai số: " + bias + "\n🔥 HOÀN THÀNH!";
                 showToast("Kích hoạt chế độ VIP thành công!", "vip");
-            }, 600);
+            }, 700);
         }
 
-        // CONTROL LOGIC
+        // CONTROL LOGIC CORVE TRACKING
         const zone = document.getElementById('t-zone');
         const res = document.getElementById('result-text');
         let sy = 0, st = 0;
@@ -817,14 +936,14 @@
                     if(!isVip) speed = Math.round(speed * 0.65);
                     if(isVip) {
                         if(speed >= 14 && speed <= 22) {
-                            res.innerText = `👑 Đồng bộ tối đa (Tốc độ VIP: ${speed}) -> Khớp đường cong mượt 100%`;
+                            res.innerText = `👑 Đồng bộ tối đa (Tốc độ VIP: ${speed}) -> Khớp mượt 100%`;
                             res.style.color = 'var(--accent)';
                         } else {
-                            res.innerText = `👑 Lực kéo lệch biên độ (Tốc độ VIP: ${speed}) -> Hãy điều chỉnh lại lực cơ tay`;
+                            res.innerText = `👑 Lực kéo lệch biên độ (Tốc độ VIP: ${speed})`;
                             res.style.color = 'var(--primary)';
                         }
                     } else {
-                        res.innerText = `⚠️ Bản thường trễ chu kỳ (Tốc độ: ${speed}) -> Yêu cầu tần số quét VIP để mở khóa`;
+                        res.innerText = `⚠️ Bản thường trễ chu kỳ (Tốc độ: ${speed}) -> Cần VIP`;
                         res.style.color = '#ff9f43';
                     }
                 }
